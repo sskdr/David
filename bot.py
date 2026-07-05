@@ -23,7 +23,21 @@ def main():
     application.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'http[s]?://'), handle_download))
 
     # 5. Boot sequence
-    print("David is running smoothly! (Console errors disabled, tracing to logs/bot.log)")
+    print("""
+
+    ███        ██████████                          ███      █████
+   ██████     ░░███░░░░███                        ░░░      ░░███ 
+  ███░░░       ░███   ░░███  ██████   █████ █████ ████   ███████ 
+ ░░█████       ░███    ░███ ░░░░░███ ░░███ ░░███ ░░███  ███░░███ 
+  ░░░░███      ░███    ░███  ███████  ░███  ░███  ░███ ░███ ░███ 
+  ██████       ░███    ███  ███░░███  ░░███ ███   ░███ ░███ ░███ 
+ ░░░███        ██████████  ░░████████  ░░█████    █████░░████████
+   ░░░        ░░░░░░░░░░    ░░░░░░░░    ░░░░░    ░░░░░  ░░░░░░░░ 
+                                                                 
+                                                                 
+                        ~$ BOT ALIVE!
+          
+          """)
     application.run_polling()
 
 if __name__ == "__main__":
