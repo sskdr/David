@@ -1,43 +1,30 @@
-import logging
-from telegram import Update
-from telegram.ext import app, CommandHandler, MessageHandler, filters
-
 import config
-from modules.download import handle_download
-from modules.weather import get_weather
-from modules.profile import get_profile
+from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
-# Enable logging
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Greets the user."""
-    await update.message.reply_text(
-        "Hello! I am David, your multi-utility assistant.\n"
-        "Send me a URL to download media, or use /weather or /profile."
-    )
+# 👇 UPDATED IMPORT PATH
+from utils.logger import setup_logger
+from modules.downloader import handle_download
+from handlers.commands import start, stop, get_profile, get_weather
 
 def main():
-    """Initializes and runs David."""
-    # Create the app using your token
-    app = app.builder().token(config.BOT_TOKEN).build()
+    # 1. Initialize silent tracking framework from utils
+    setup_logger()
 
-    # Register basic controls
-    app.add_handler(CommandHandler("start", start))
-    
-    # Register core features from separate modules
-    app.add_handler(CommandHandler("weather", get_weather))
-    app.add_handler(CommandHandler("profile", get_profile))
-    
-    # Catch-all text filter to detect incoming links for downloading
-    # Checks if text looks like a URL
-    app.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'http[s]?://'), handle_download))
+    # 2. Build the application mapping engine
+    application = Application.builder().token(config.BOT_TOKEN).build()
 
-    # Run the bot until you press Ctrl-C
-    print("David is now online and waiting for input...")
-    app.run_polling()
+    # 3. Connect handler routines
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("stop", stop))
+    application.add_handler(CommandHandler("weather", get_weather))
+    application.add_handler(CommandHandler("profile", get_profile))
+    
+    # 4. Global URL parsing routing
+    application.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'http[s]?://'), handle_download))
+
+    # 5. Boot sequence
+    print("David is running smoothly! (Console errors disabled, tracing to logs/bot.log)")
+    application.run_polling()
 
 if __name__ == "__main__":
     main()
