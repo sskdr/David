@@ -1,8 +1,11 @@
 import config
 from telegram import Update, ReactionTypeEmoji
 from telegram.ext import ContextTypes
+from config import SUPER_ADMIN_ID, BANNED_USERS
+from handlers.restrict import save_bans
+import json
 
-# 👇 UPDATED IMPORT PATH
+
 from utils.formatters import get_start_keyboard, format_welcome_msg, WELCOME_STICKER
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -38,8 +41,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Bot shutting down...")
-    exit(42)
+    user_id = update.effective_user.id
+
+
+    if str(user_id) == str(SUPER_ADMIN_ID):
+        await update.message.reply_text("⭕️ *Bot shutting down . . .*", parse_mode="Markdown")
+        exit(42)
+    else:
+        await update.message.reply_text(f"❗️Unauthorized command from user : {user_id}")
+        await update.message.reply_text(f"❗️User Banned : {user_id}")
+        BANNED_USERS.add(user_id)
+        save_bans()
+
 
 async def get_profile(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

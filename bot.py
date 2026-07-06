@@ -1,19 +1,19 @@
 import config
-from telegram.ext import Application, CommandHandler, MessageHandler, filters
-
-# 👇 UPDATED IMPORT PATH
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, TypeHandler
+from telegram import Update
+from config import global_ban_checker
 from utils.logger import setup_logger
 from modules.downloader import handle_download
 from handlers.commands import start, stop, get_profile, get_weather
 
+
 def main():
-    # 1. Initialize silent tracking framework from utils
     setup_logger()
 
-    # 2. Build the application mapping engine
     application = Application.builder().token(config.BOT_TOKEN).build()
 
-    # 3. Connect handler routines
+    application.add_handler(TypeHandler(Update, global_ban_checker), group=-1)
+
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("stop", stop))
     application.add_handler(CommandHandler("weather", get_weather))
@@ -23,6 +23,7 @@ def main():
     application.add_handler(MessageHandler(filters.TEXT & filters.Regex(r'http[s]?://'), handle_download))
 
     # 5. Boot sequence
+    print("\033[H\033[J", end="")
     print("""
 
     ███        ██████████                          ███      █████
@@ -35,7 +36,7 @@ def main():
    ░░░        ░░░░░░░░░░    ░░░░░░░░    ░░░░░    ░░░░░  ░░░░░░░░ 
                                                                  
                                                                  
-                        ~$ BOT ALIVE!
+                          ~$ BOT ALIVE!
           
           """)
     application.run_polling()
